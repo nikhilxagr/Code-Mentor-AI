@@ -1,8 +1,8 @@
 import express from "express";
-import cors from "cors";
-// import solveRoute from "./routes/auth.routes.js";
+import authRoutes from "./routes/auth.routes.js";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
+import solveRoutes from "./routes/solve.routes.js"; 
 
 dotenv.config();
 
@@ -12,9 +12,11 @@ const app = express();
 
 app.use(express.json());
 
-// app.use("/api", solveRoute);
 
 console.log("Checking API Key...", process.env.GEMINI_API_KEY ? "Loaded Successfully" : "MISSING!");
+app.use("/api/auth", authRoutes);
+app.use("/api", solveRoutes); //
+
 
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
