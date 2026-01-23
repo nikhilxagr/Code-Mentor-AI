@@ -1,29 +1,43 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-import Navbar from "../components/common/Navbar";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 const Signup = () => {
- 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  
-  const handleSubmit = (e) => {
-    e.preventDefault(); 
+  const { register } = useAuth();
+  const navigate = useNavigate();
 
-    
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+
+    // Validate passwords match
     if (password !== confirmPassword) {
-      alert("Passwords do not match!");
+      setError("Passwords do not match!");
       return;
     }
-    
-    console.log("Signup Data:", {
-      name,
-      email,
-      password,
-    });
+
+    setLoading(true);
+
+    try {
+      const result = await register({ name, email, password });
+
+      if (result.success) {
+        navigate("/dashboard");
+      } else {
+        setError(result.error || "Registration failed. Please try again.");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -41,6 +55,13 @@ const Signup = () => {
 
         {/* Signup Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Name Input */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -104,9 +125,10 @@ const Signup = () => {
           {/* Signup Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Sign Up
+            {loading ? "Creating Account..." : "Sign Up"}
           </button>
         </form>
 
