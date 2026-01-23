@@ -1,35 +1,18 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/common/Navbar";
+
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* ================= NAVBAR ================= */}
+      {/*  NAVBAR  */}
       <header className="bg-white border-b">
-        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
-          <h1 className="text-2xl font-extrabold text-blue-600">
-            CodeMentor AI
-          </h1>
-
-          <div className="flex gap-4">
-            <Link
-              to="/login"
-              className="text-gray-600 hover:text-blue-600 font-medium"
-            >
-              Login
-            </Link>
-            <Link
-              to="/signup"
-              className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
-            >
-              Sign Up
-            </Link>
-          </div>
-        </div>
+        <Navbar />
       </header>
 
-      {/* ================= HERO SECTION ================= */}
-      <main className="flex-1">
-        <section className="max-w-7xl mx-auto px-6 py-24 text-center">
+      {/*  HERO SECTION  */}
+      <main>
+        <section className="max-w-7xl mx-auto px-6 py-16 text-center">
           <h2 className="text-5xl font-extrabold text-gray-900 leading-tight mb-6">
             Learn DSA the <span className="text-blue-600">Right Way</span>
           </h2>
@@ -56,7 +39,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* ================= FEATURES SECTION ================= */}
+        {/*  FEATURES SECTION  */}
         <section className="bg-white py-20">
           <div className="max-w-7xl mx-auto px-6">
             <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
@@ -100,7 +83,7 @@ const Home = () => {
           </div>
         </section>
 
-        {/* ================= CALL TO ACTION ================= */}
+        {/*  CALL TO ACTION  */}
         <section className="bg-blue-600 py-20 text-center">
           <h3 className="text-3xl font-bold text-white mb-4">
             Ready to start your DSA journey?
@@ -117,7 +100,7 @@ const Home = () => {
         </section>
       </main>
 
-      {/* ================= FOOTER ================= */}
+      {/*  FOOTER  */}
       <footer className="bg-white border-t py-4 text-center text-sm text-gray-500">
         © 2026 CodeMentor AI · Built for beginners
       </footer>
