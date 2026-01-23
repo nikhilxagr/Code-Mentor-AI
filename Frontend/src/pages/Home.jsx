@@ -1,48 +1,125 @@
-import React from "react";
+import { Link } from "react-router-dom";
 
 const Home = () => {
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/* Navbar Section */}
-      <nav className="w-full bg-white shadow-sm px-6 py-4 flex justify-between items-center">
-        <h1 className="text-xl font-bold text-blue-600">CodeMentor AI</h1>
+      {/* ================= NAVBAR ================= */}
+      <header className="bg-white border-b">
+        <div className="max-w-7xl mx-auto px-6 py-4 flex items-center justify-between">
+          <h1 className="text-2xl font-extrabold text-blue-600">
+            CodeMentor AI
+          </h1>
 
-        <div className="space-x-4">
-          <button className="text-gray-600 hover:text-blue-600">Login</button>
-          <button className="bg-blue-600 text-white px-4 py-2 rounded-md hover:bg-blue-700">
-            Sign Up
-          </button>
+          <div className="flex gap-4">
+            <Link
+              to="/login"
+              className="text-gray-600 hover:text-blue-600 font-medium"
+            >
+              Login
+            </Link>
+            <Link
+              to="/signup"
+              className="bg-blue-600 text-white px-5 py-2 rounded-md hover:bg-blue-700 transition"
+            >
+              Sign Up
+            </Link>
+          </div>
         </div>
-      </nav>
+      </header>
 
-      {/* Main Hero Section */}
-      <main className="flex-1 flex items-center justify-center px-6">
-        <div className="max-w-3xl text-center">
-          <h2 className="text-4xl font-bold text-gray-800 mb-4">
-            Learn DSA the Right Way
+      {/* ================= HERO SECTION ================= */}
+      <main className="flex-1">
+        <section className="max-w-7xl mx-auto px-6 py-24 text-center">
+          <h2 className="text-5xl font-extrabold text-gray-900 leading-tight mb-6">
+            Learn DSA the <span className="text-blue-600">Right Way</span>
           </h2>
 
-          <p className="text-gray-600 text-lg mb-6">
-            CodeMentor AI helps beginners understand{" "}
-            <span className="font-semibold">how to think</span>
+          <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-10">
+            CodeMentor AI helps beginners understand how to{" "}
+            <span className="font-semibold text-gray-800">think logically</span>{" "}
             while solving DSA problems — not just copy solutions.
           </p>
 
-          <div className="flex justify-center gap-4">
-            <button className="bg-blue-600 text-white px-6 py-3 rounded-md text-lg hover:bg-blue-700">
-              Get Started
-            </button>
-
-            <button className="border border-blue-600 text-blue-600 px-6 py-3 rounded-md text-lg hover:bg-blue-50">
+          <div className="flex justify-center gap-5">
+            <Link
+              to="/signup"
+              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition"
+            >
+              Get Started 🚀
+            </Link>
+            <Link
+              to="/login"
+              className="border border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-blue-50 transition"
+            >
               Learn More
-            </button>
+            </Link>
           </div>
-        </div>
+        </section>
+
+        {/* ================= FEATURES SECTION ================= */}
+        <section className="bg-white py-20">
+          <div className="max-w-7xl mx-auto px-6">
+            <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
+              Why CodeMentor AI?
+            </h3>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {/* Feature 1 */}
+              <div className="bg-gray-50 p-8 rounded-xl border hover:shadow-md transition">
+                <h4 className="text-xl font-semibold mb-3">
+                  🧠 Clear Problem Approach
+                </h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Understand the exact mindset required to solve DSA problems
+                  step by step, just like an experienced mentor.
+                </p>
+              </div>
+
+              {/* Feature 2 */}
+              <div className="bg-gray-50 p-8 rounded-xl border hover:shadow-md transition">
+                <h4 className="text-xl font-semibold mb-3">
+                  📘 Beginner-Friendly Explanations
+                </h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Explanations designed specifically for freshers and
+                  early-stage developers, with no unnecessary jargon.
+                </p>
+              </div>
+
+              {/* Feature 3 */}
+              <div className="bg-gray-50 p-8 rounded-xl border hover:shadow-md transition">
+                <h4 className="text-xl font-semibold mb-3">
+                  ⚡ Faster Interview Prep
+                </h4>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  Focus on logic and patterns so you can prepare smarter and
+                  faster for coding interviews.
+                </p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ================= CALL TO ACTION ================= */}
+        <section className="bg-blue-600 py-20 text-center">
+          <h3 className="text-3xl font-bold text-white mb-4">
+            Ready to start your DSA journey?
+          </h3>
+          <p className="text-blue-100 mb-8">
+            Join CodeMentor AI and learn problem-solving the right way.
+          </p>
+          <Link
+            to="/signup"
+            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
+          >
+            Create Free Account
+          </Link>
+        </section>
       </main>
 
-      {/* Footer Section */}
-      <footer className="bg-white text-center py-4 text-sm text-gray-500">
-        © 2026 CodeMentor AI. Built for beginners.
+      {/* ================= FOOTER ================= */}
+      <footer className="bg-white border-t py-4 text-center text-sm text-gray-500">
+        © 2026 CodeMentor AI · Built for beginners
       </footer>
     </div>
   );
