@@ -1,4 +1,5 @@
 import { useState } from "react";
+import Navbar from "../components/common/Navbar";
 
 const ProblemSolver = () => {
   // -----------------------------
@@ -19,7 +20,6 @@ const ProblemSolver = () => {
   const handleSolve = (e) => {
     e.preventDefault();
 
-    // Basic validation
     if (!problem.trim()) {
       alert("Please enter a DSA problem");
       return;
@@ -27,7 +27,7 @@ const ProblemSolver = () => {
 
     setLoading(true);
 
-    // Simulating AI response (later replaced by backend API)
+    // Simulated AI response
     setTimeout(() => {
       setResult({
         approach:
@@ -35,9 +35,9 @@ const ProblemSolver = () => {
         steps: [
           "Initialize an empty hash map",
           "Traverse the array",
-          "Check if target - current element exists in map",
+          "Check if target - current element exists",
           "If yes, return indices",
-          "Else, store element in map",
+          "Otherwise, store element in map",
         ],
         code: `function twoSum(nums, target) {
   const map = {};
@@ -57,8 +57,12 @@ const ProblemSolver = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 px-4 py-8">
-      <div className="max-w-5xl mx-auto">
+    <div className="min-h-screen bg-gray-50">
+      {/* Reusable Navbar */}
+      <Navbar />
+
+      {/* Page Content */}
+      <main className="max-w-7xl mx-auto px-6 py-10">
         {/* Page Heading */}
         <h1 className="text-3xl font-bold text-gray-800 mb-6">
           DSA Problem Solver 🤖
@@ -67,7 +71,7 @@ const ProblemSolver = () => {
         {/* Input Section */}
         <form
           onSubmit={handleSolve}
-          className="bg-white p-6 rounded-lg shadow mb-8"
+          className="bg-white p-6 rounded-lg shadow mb-10"
         >
           {/* Problem Input */}
           <div className="mb-4">
@@ -119,7 +123,7 @@ const ProblemSolver = () => {
               <p className="text-gray-700">{result.approach}</p>
             </div>
 
-            {/* Step-by-step Explanation */}
+            {/* Steps */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-xl font-semibold mb-2">
                 Step-by-step Explanation
@@ -131,7 +135,7 @@ const ProblemSolver = () => {
               </ul>
             </div>
 
-            {/* Code Section */}
+            {/* Code */}
             <div className="bg-white p-6 rounded-lg shadow">
               <h2 className="text-xl font-semibold mb-2">
                 Solution Code ({language})
@@ -150,7 +154,7 @@ const ProblemSolver = () => {
             </div>
           </div>
         )}
-      </div>
+      </main>
     </div>
   );
 };

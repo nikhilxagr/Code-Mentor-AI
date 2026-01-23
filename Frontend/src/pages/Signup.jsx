@@ -1,31 +1,24 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
+import Navbar from "../components/common/Navbar";
 
 const Signup = () => {
-  /*
-    State variables to store form input values.
-    This makes the form controlled and predictable.
-  */
+ 
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
 
-  /*
-    This function runs when the user submits the signup form.
-    For now, it only validates and logs data.
-    Later, this will call the backend signup API.
-  */
+  
   const handleSubmit = (e) => {
-    e.preventDefault(); // Prevent page reload
+    e.preventDefault(); 
 
-    // Basic frontend validation
+    
     if (password !== confirmPassword) {
       alert("Passwords do not match!");
       return;
     }
-
-    // Temporary output (will be replaced by API call)
+    
     console.log("Signup Data:", {
       name,
       email,
