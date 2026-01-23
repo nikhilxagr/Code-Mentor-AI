@@ -8,6 +8,8 @@ const Login = () => {
   // -----------------------------
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
   // -----------------------------
   // Global auth function
@@ -22,20 +24,24 @@ const Login = () => {
   // -----------------------------
   // Handle form submit
   // -----------------------------
-  const handleSubmit = (e) => {
-    e.preventDefault(); // stop page refresh
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setError("");
+    setLoading(true);
 
-    /*
-      TEMPORARY LOGIN (FAKE)
-      Later this will be replaced by backend API
-    */
-    login({
-      name: "Nikhil",
-      email: email,
-    });
+    try {
+      const result = await login({ email, password });
 
-    // Redirect user after login
-    navigate("/dashboard");
+      if (result.success) {
+        navigate("/dashboard");
+      } else {
+        setError(result.error || "Login failed. Please try again.");
+      }
+    } catch (err) {
+      setError("An unexpected error occurred. Please try again.");
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -51,6 +57,13 @@ const Login = () => {
 
         {/* Login Form */}
         <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Error Message */}
+          {error && (
+            <div className="bg-red-50 text-red-600 p-3 rounded-md text-sm">
+              {error}
+            </div>
+          )}
+
           {/* Email */}
           <div>
             <label className="block text-sm font-medium text-gray-600 mb-1">
@@ -84,9 +97,10 @@ const Login = () => {
           {/* Submit Button */}
           <button
             type="submit"
-            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition"
+            disabled={loading}
+            className="w-full bg-blue-600 text-white py-2 rounded-md font-semibold hover:bg-blue-700 transition disabled:bg-gray-400 disabled:cursor-not-allowed"
           >
-            Login
+            {loading ? "Logging in..." : "Login"}
           </button>
         </form>
 

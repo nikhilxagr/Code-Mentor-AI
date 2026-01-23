@@ -1,8 +1,9 @@
 import express from "express";
+import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import dotenv from "dotenv";
 import connectDB from "./config/db.js";
-import solveRoutes from "./routes/solve.routes.js"; 
+import solveRoutes from "./routes/solve.routes.js";
 
 dotenv.config();
 
@@ -10,13 +11,22 @@ connectDB();
 
 const app = express();
 
+// CORS Configuration
+const corsOptions = {
+  origin: process.env.FRONTEND_URL || "http://localhost:5173",
+  credentials: true,
+  optionsSuccessStatus: 200,
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
 
-
-console.log("Checking API Key...", process.env.GEMINI_API_KEY ? "Loaded Successfully" : "MISSING!");
+console.log(
+  "Checking API Key...",
+  process.env.GEMINI_API_KEY ? "Loaded Successfully" : "MISSING!",
+);
 app.use("/api/auth", authRoutes);
 app.use("/api", solveRoutes); //
-
 
 app.get("/", (req, res) => {
   res.send("Backend running 🚀");
