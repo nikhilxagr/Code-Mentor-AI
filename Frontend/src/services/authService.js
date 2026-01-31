@@ -4,30 +4,22 @@ import api from "./api";
 const authService = {
   // Register a new user
   register: async (userData) => {
-    try {
-      const response = await api.post("/auth/signup", userData);
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-      }
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.message || "Registration failed";
+    const response = await api.post("/auth/signup", userData);
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
     }
+    return response.data;
   },
 
   // Login user
   login: async (credentials) => {
-    try {
-      const response = await api.post("/auth/login", credentials);
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-      }
-      return response.data;
-    } catch (error) {
-      throw error.response?.data?.message || "Login failed";
+    const response = await api.post("/auth/login", credentials);
+    if (response.data.token) {
+      localStorage.setItem("token", response.data.token);
+      localStorage.setItem("user", JSON.stringify(response.data.user));
     }
+    return response.data;
   },
 
   // Logout user
@@ -49,6 +41,12 @@ const authService = {
   // Check if user is authenticated
   isAuthenticated: () => {
     return !!localStorage.getItem("token");
+  },
+
+  // Get user profile from API
+  getProfile: async () => {
+    const response = await api.get("/auth/profile");
+    return response.data;
   },
 };
 

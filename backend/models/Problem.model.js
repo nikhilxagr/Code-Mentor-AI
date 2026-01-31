@@ -1,20 +1,37 @@
 import mongoose from "mongoose";
 
-const userSchema = new mongoose.Schema({
-  name: {
+const problemSchema = new mongoose.Schema({
+  userId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "User",
+    required: true
+  },
+
+  problemNumber: {
     type: String,
     required: true
   },
 
-  email: {
-    type: String,
-    required: true,
-    unique: true
-  },
-
-  password: {
+  problemTitle: {
     type: String,
     required: true
+  },
+
+  solution: {
+    type: String,
+    required: true
+  },
+
+  approach: {
+    type: String
+  },
+
+  timeComplexity: {
+    type: String
+  },
+
+  spaceComplexity: {
+    type: String
   },
 
   createdAt: {
@@ -23,5 +40,5 @@ const userSchema = new mongoose.Schema({
   }
 });
 
-const User = mongoose.model("User", userSchema);
-export default User;
+const Problem = mongoose.model("Problem", problemSchema);
+export default Problem;

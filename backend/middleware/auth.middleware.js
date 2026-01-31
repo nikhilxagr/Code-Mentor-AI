@@ -1,30 +1,43 @@
 import jwt from "jsonwebtoken";
 
-const protect = (req, res, next) => {
+export const protect = async (req, res, next) => {
   try {
-    const authHeader = req.headers.authorization;
+    let token;
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    // Check for token in Authorization header
+    if (
+      req.headers.authorization &&
+      req.headers.authorization.startsWith("Bearer")
+    ) {
+      token = req.headers.authorization.split(" ")[1];
+    }
+
+    if (!token) {
       return res.status(401).json({
         success: false,
-        message: "Not authorized, token missing"
+        message: "Not authorized, no token"
       });
     }
 
-    const token = authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = decoded.userId;
-
-    next();
-
+    try {
+      // Verify token
+      const decoded = jwt.verify(token, process.env.JWT_SECRET);
+      
+      // Add user info to request
+      req.user = decoded;
+      
+      next();
+    } catch (error) {
+      return res.status(401).json({
+        success: false,
+        message: "Not authorized, token failed"
+      });
+    }
   } catch (error) {
-    return res.status(401).json({
+    return res.status(500).json({
       success: false,
-      message: "Not authorized, token invalid"
+      message: "Auth middleware error",
+      error: error.message
     });
   }
 };
-
-export default protect;
