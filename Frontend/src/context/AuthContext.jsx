@@ -20,26 +20,32 @@ export const AuthProvider = ({ children }) => {
   }, []);
 
   const login = async (credentials) => {
-    const data = await authService.login(credentials);
-    setIsAuthenticated(true);
-    setUser(data.user);
-    return data;
-  };
-
-  const register = async (userData) => {
     try {
-      await authService.register(userData);
-      return { success: true };
+      const data = await authService.login(credentials);
+      setIsAuthenticated(true);
+      setUser(data.user);
+      return { success: true, data };
     } catch (error) {
       return {
         success: false,
-        error:
-          error.response?.data?.message ||
-          "Registration failed. Please try again.",
+        error: error.response?.data?.message || "Login failed. Please try again.",
       };
     }
   };
 
+  const register = async (userData) => {
+    try {
+      const data = await authService.register(userData);
+      setIsAuthenticated(true);
+      setUser(data.user);
+      return { success: true, data };
+    } catch (error) {
+      return {
+        success: false,
+        error: error.response?.data?.message || "Registration failed. Please try again.",
+      };
+    }
+  };
 
   const logout = () => {
     authService.logout();

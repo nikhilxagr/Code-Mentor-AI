@@ -1,9 +1,13 @@
 import express from "express";
-import { solveProblem, analyzeCode } from "../controllers/solve.controller.js"; 
+import { getSolution, analyzeProblem } from "../controllers/solve.controller.js";
+import { protect } from "../middleware/auth.middleware.js";
+
 const router = express.Router();
 
-router.get("/solve/:id", solveProblem);
+router.get("/solve/:id", protect, getSolution);
 
-router.post("/analyze", analyzeCode);
+// TEMPORARY: Remove protect middleware for testing
+// Change this back to: router.post("/analyze", protect, analyzeProblem);
+router.post("/analyze", analyzeProblem);
 
 export default router;
