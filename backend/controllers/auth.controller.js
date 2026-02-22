@@ -1,4 +1,4 @@
-import supabase from "../config/supabase.js";
+import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 
@@ -24,11 +24,7 @@ export const signup = async (req, res) => {
     }
 
     // Check if user exists
-    const { data: existingUser } = await supabase
-      .from('users')
-      .select('id, email')
-      .eq('email', email)
-      .single();
+    const existingUser = await User.findOne({ email });
 
     if (existingUser) {
       return res.status(409).json({
@@ -41,30 +37,15 @@ export const signup = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, 10);
 
     // Create user
-    const { data: newUser, error: insertError } = await supabase
-      .from('users')
-      .insert([
-        {
-          name,
-          email,
-          password: hashedPassword
-        }
-      ])
-      .select()
-      .single();
-
-    if (insertError) {
-      console.error('Supabase insert error:', insertError);
-      return res.status(500).json({
-        success: false,
-        message: "Failed to create user",
-        error: insertError.message
-      });
-    }
+    const newUser = await User.create({
+      name,
+      email,
+      password: hashedPassword
+    });
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: newUser.id },
+      { userId: newUser._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -74,7 +55,7 @@ export const signup = async (req, res) => {
       message: "Signup successful",
       token,
       user: {
-        id: newUser.id,
+        id: newUser._id,
         name: newUser.name,
         email: newUser.email
       }
@@ -103,13 +84,9 @@ export const login = async (req, res) => {
     }
 
     // Find user by email
-    const { data: user, error: fetchError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
+    const user = await User.findOne({ email });
 
-    if (fetchError || !user) {
+    if (!user) {
       return res.status(401).json({
         success: false,
         message: "Invalid credentials"
@@ -127,7 +104,7 @@ export const login = async (req, res) => {
 
     // Generate JWT token
     const token = jwt.sign(
-      { userId: user.id },
+      { userId: user._id },
       process.env.JWT_SECRET,
       { expiresIn: "7d" }
     );
@@ -137,7 +114,7 @@ export const login = async (req, res) => {
       message: "Login successful",
       token,
       user: {
-        id: user.id,
+        id: user._id,
         name: user.name,
         email: user.email
       }
@@ -158,14 +135,10 @@ export const getProfile = async (req, res) => {
     // req.user is set by auth middleware
     const userId = req.user.userId;
 
-    // Fetch user from Supabase
-    const { data: user, error } = await supabase
-      .from('users')
-      .select('id, name, email, created_at')
-      .eq('id', userId)
-      .single();
+    // Fetch user from DB
+    const user = await User.findById(userId).select('-password');
 
-    if (error || !user) {
+    if (!user) {
       return res.status(404).json({
         success: false,
         message: "User not found"
@@ -175,10 +148,10 @@ export const getProfile = async (req, res) => {
     res.status(200).json({
       success: true,
       user: {
-        id: user.id,
+        id: user._id,
         name: user.name,
         email: user.email,
-        createdAt: user.created_at
+        createdAt: user.createdAt
       }
     });
 

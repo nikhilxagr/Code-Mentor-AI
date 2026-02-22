@@ -1,5 +1,5 @@
 import { GoogleGenerativeAI } from "@google/generative-ai";
-import supabase from "../config/supabase.js";
+import Problem from "../models/Problem.model.js";
 
 const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY);
 
@@ -8,15 +8,10 @@ export const getSolution = async (req, res) => {
     const { id } = req.params;
     const userId = req.user.userId;
 
-    // Fetch problem from Supabase
-    const { data: problem, error } = await supabase
-      .from('problems')
-      .select('*')
-      .eq('id', id)
-      .eq('user_id', userId)
-      .single();
+    // Fetch problem from DB
+    const problem = await Problem.findOne({ _id: id, userId });
 
-    if (error || !problem) {
+    if (!problem) {
       return res.status(404).json({
         success: false,
         message: "Problem not found"
@@ -113,48 +108,31 @@ Format your response with clear markdown sections. Make it educational and easy 
 
     // Call Gemini AI
     try {
-      const model = genAI.getGenerativeModel({ model: "gemini-3-pro" });
+      const model = genAI.getGenerativeModel({ model: "gemini-pro" });
       const result = await model.generateContent(prompt);
       const response = await result.response;
       const answer = response.text();
 
       console.log(`✅ AI response generated (${answer.length} characters)`);
 
-      // Save to Supabase only if user is logged in
+      // Save to DB only if user is logged in
       if (userId) {
-        const { data: savedProblem, error: insertError } = await supabase
-          .from('problems')
-          .insert([
-            {
-              user_id: userId,
-              problem_number: problemNumber,
-              problem_title: `LeetCode Problem #${problemNumber}`,
-              solution: answer,
-              approach: "AI-generated optimal solution with detailed explanation",
-              time_complexity: "Extracted from AI response",
-              space_complexity: "Extracted from AI response"
-            }
-          ])
-          .select()
-          .single();
+        const savedProblem = await Problem.create({
+          userId,
+          problemNumber,
+          problemTitle: `LeetCode Problem #${problemNumber}`,
+          solution: answer,
+          approach: "AI-generated optimal solution with detailed explanation",
+          timeComplexity: "Extracted from AI response",
+          spaceComplexity: "Extracted from AI response"
+        });
 
-        if (insertError) {
-          console.error('⚠️ Database save error:', insertError.message);
-          // Still return AI response even if save fails
-          return res.status(200).json({
-            success: true,
-            answer,
-            saved: false,
-            message: "Solution generated but not saved to database"
-          });
-        }
-
-        console.log(`💾 Solution saved to database with ID: ${savedProblem.id}`);
+        console.log(`💾 Solution saved to database with ID: ${savedProblem._id}`);
 
         return res.status(200).json({
           success: true,
           answer,
-          problemId: savedProblem.id,
+          problemId: savedProblem._id,
           saved: true
         });
       } else {

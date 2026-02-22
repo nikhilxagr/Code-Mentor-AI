@@ -2,13 +2,13 @@ import express from "express";
 import cors from "cors";
 import authRoutes from "./routes/auth.routes.js";
 import dotenv from "dotenv";
-import { connectSupabase } from "./config/supabase.js";
+import connectDB from "./config/db.js";
 import solveRoutes from "./routes/solve.routes.js";
 
 dotenv.config();
 
-// Connect to Supabase (non-blocking)
-connectSupabase();
+// Connect to MongoDB
+connectDB();
 
 const app = express();
 
@@ -40,7 +40,7 @@ app.get("/", (req, res) => {
   res.json({
     status: "running",
     message: "CodeMentor AI Backend is live! 🚀",
-    database: global.isSupabaseConnected ? "✅ Supabase Connected" : "❌ Database Disconnected",
+    database: global.isMongoConnected ? "✅ MongoDB Connected" : "❌ Database Disconnected",
     endpoints: {
       auth: "/api/auth",
       solve: "/api/solve/:id",

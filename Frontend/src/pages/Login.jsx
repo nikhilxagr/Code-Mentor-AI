@@ -43,7 +43,7 @@ const Login = () => {
         </div>
 
         {/* Login Card */}
-        <div className="bg-white p-8 rounded-2xl shadow-xl border border-gray-100">
+        <div className="bg-white/30 backdrop-blur-lg p-8 rounded-2xl shadow-xl border border-gray-100">
           <h2 className="text-2xl font-bold text-center text-gray-800 mb-2">
             Welcome Back! 👋
           </h2>
