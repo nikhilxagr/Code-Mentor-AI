@@ -1,6 +1,36 @@
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+const extractQuickResult = (markdown) => {
+  const lines = String(markdown || "")
+    .replace(/\r\n/g, "\n")
+    .split("\n")
+    .map((line) => line.trim())
+    .filter(Boolean);
+
+  for (const rawLine of lines) {
+    if (rawLine.startsWith("```")) {
+      continue;
+    }
+
+    const cleanLine = rawLine
+      .replace(/^#{1,6}\s*/, "")
+      .replace(/^\d+\.\s*/, "")
+      .replace(/^[-*]\s*/, "")
+      .replace(/\*\*/g, "")
+      .replace(/`/g, "")
+      .trim();
+
+    if (!cleanLine) {
+      continue;
+    }
+
+    return cleanLine.length > 220 ? `${cleanLine.slice(0, 217)}...` : cleanLine;
+  }
+
+  return "Result ready.";
+};
+
 const normalizeMarkdown = (input) => {
   let text = String(input || "").replace(/\r\n/g, "\n").trim();
 
@@ -102,6 +132,7 @@ const OutputSection = ({ result }) => {
 
   const content = result.answer || "";
   const normalizedContent = normalizeMarkdown(content);
+  const quickResult = extractQuickResult(normalizedContent);
 
   return (
     <section className="mt-8 space-y-4">
@@ -130,6 +161,11 @@ const OutputSection = ({ result }) => {
             Review the explanation, then code it yourself before copying final implementation.
           </p>
         </header>
+
+        <div className="mt-5 rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3">
+          <p className="text-xs font-semibold uppercase tracking-wide text-emerald-700">Quick Result</p>
+          <p className="mt-1 text-sm font-semibold text-emerald-900">{quickResult}</p>
+        </div>
 
         <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-2 md:px-6 md:py-4">
           <ReactMarkdown remarkPlugins={[remarkGfm]} components={markdownComponents}>

@@ -213,94 +213,95 @@ const sendGeminiError = (res, error, fallbackMessage) => {
 
 const buildLeetCodePrompt = (problemNumber) => `You are an expert coding instructor and interview mentor.
 
-Analyze LeetCode problem #${problemNumber} and return an educational answer in markdown.
-Use clear section headers exactly in this order:
+Analyze LeetCode problem #${problemNumber} and return concise markdown.
+The user wants the direct result first, then short explanation.
 
-1. Problem Overview
-2. Key Insight
-3. Step-by-Step Approach
-4. Python Solution
-5. JavaScript Solution
-6. Complexity Analysis
-7. Edge Cases
-8. Practice Follow-ups
+Use exact section order:
+1. Direct Answer
+2. Python Code
+3. JavaScript Code
+4. Complexity
+5. Short Explanation
+6. Edge Cases
 
 Rules:
-- Keep explanations concise but clear for beginners.
-- Include code blocks for Python and JavaScript.
-- Mention time and space complexity explicitly.
-- Keep the full answer under 1200 words.
+- In "Complexity", give exactly 2 lines:
+  Time Complexity: O(...)
+  Space Complexity: O(...)
+- Keep explanation short and practical.
+- Max 550 words total.
 `;
 
 const buildComplexityPrompt = ({ language, code }) => `You are a senior software engineer and algorithms reviewer.
 
-Analyze the following ${language} code and estimate complexity.
-
-Code:
+Analyze this ${language} code:
 \`\`\`${language}
 ${code}
 \`\`\`
 
-Return markdown with exact sections:
-1. Quick Summary
-2. Time Complexity
-3. Space Complexity
-4. Complexity by Major Step (table)
-5. Optimization Ideas
-6. Final Complexity Verdict
+Return concise markdown in exact order:
+1. Result
+2. Short Why
+3. Improvement Hint
 
 Rules:
-- Use Big-O notation.
-- Explain best/average/worst if relevant.
-- If code has branches with different complexity, explain each clearly.
-- Keep under 900 words.
+- In "Result", first line must be:
+  Time Complexity: O(...)
+- Second line must be:
+  Space Complexity: O(...)
+- "Short Why" must be at most 4 bullets.
+- "Improvement Hint" at most 3 bullets.
+- Max 260 words total.
 `;
 
-const buildDebugPrompt = ({ language, code }) => `You are a strict code reviewer and debugger.
+const buildDebugPrompt = ({ language, code }) => `You are a strict code reviewer for coding interview and LeetCode style solutions.
 
-Review this ${language} code for syntax issues, logical bugs, runtime problems, and edge-case failures.
-
-Code:
+Review this ${language} code:
 \`\`\`${language}
 ${code}
 \`\`\`
 
-Return markdown with exact sections:
-1. Quick Assessment
-2. Syntax or Compile Errors
-3. Logical or Runtime Errors
-4. Edge Cases That Fail
-5. Fixed Code (same language)
-6. Test Cases to Verify Fix
+Return concise markdown in exact order:
+1. Verdict
+2. Corrected Code
+3. Errors Found
+4. Quick Tests
 
 Rules:
-- If there are no issues in a section, explicitly say "None found".
-- In "Fixed Code", provide one corrected full code block.
-- Keep it practical and precise.
-- Keep under 1000 words.
+- In "Verdict", first line must be:
+  Error Found: Yes/No
+- If error found, say it immediately in first 2 lines.
+- In "Corrected Code", give one full copy-paste-ready code block in same language.
+- If no error found, still provide clean final code first, then say "Errors Found: None".
+- Handle valid LeetCode-style solutions correctly, do not invent fake compile errors.
+- "Errors Found" max 5 bullets.
+- "Quick Tests" max 4 bullets.
+- Max 420 words total.
 `;
 
 const buildOptimizationPrompt = ({ language, code }) => `You are an algorithms optimization mentor.
 
-The user likely wrote a brute-force solution. Improve it to an optimal or near-optimal approach while keeping the same problem goal.
-
-Original ${language} code:
+User pasted ${language} code:
 \`\`\`${language}
 ${code}
 \`\`\`
 
-Return markdown with exact sections:
-1. Current Approach Analysis
-2. Bottlenecks in the Current Code
-3. Optimized Strategy
-4. Optimized Code (same language)
-5. Complexity Comparison (table)
-6. Why the New Version is Better
+Return concise markdown in exact order:
+1. Optimality Check
+2. Best Code
+3. Complexity
+4. Short Notes
 
 Rules:
-- Provide one full improved code block in the same language.
-- Mention any assumptions.
-- Keep under 1000 words.
+- In "Optimality Check", first line must be:
+  Already Optimal: Yes/No
+- If Yes: state that it is already optimal and still provide clean copy-paste-ready final code in "Best Code".
+- If No: provide optimized copy-paste-ready code first in "Best Code", then explain briefly.
+- In "Complexity", give exactly 2 lines:
+  Current: Time O(...), Space O(...)
+  Best: Time O(...), Space O(...)
+- "Short Notes" max 4 bullets.
+- Max 420 words total.
 `;
 
 export const getSolution = async (req, res) => {

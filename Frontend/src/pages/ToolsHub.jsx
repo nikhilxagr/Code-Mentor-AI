@@ -33,10 +33,10 @@ const ToolsHub = () => {
       <main className="mx-auto max-w-7xl px-4 pb-16 pt-10 md:px-6">
         <section className="fade-slide mb-8 rounded-3xl border border-white/80 bg-gradient-to-r from-emerald-700 via-teal-700 to-cyan-600 px-6 py-8 text-white shadow-xl md:px-10">
           <p className="text-xs font-semibold uppercase tracking-wider text-emerald-100">Developer Tools</p>
-          <h1 className="mt-2 text-3xl font-bold md:text-5xl">AI Code Toolkit</h1>
+          <h1 className="mt-2 text-3xl font-bold md:text-5xl">AI Code Toolkit (One Place)</h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-emerald-50 md:text-base">
-            Three focused tools powered by Gemini: complexity estimation, bug review, and brute-force
-            optimization. Choose one and paste your code.
+            A single workspace for complexity, debugging, and optimization. Every tool prioritizes direct
+            output first, with short explanation after.
           </p>
         </section>
 

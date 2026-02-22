@@ -49,21 +49,21 @@ const ComplexityTool = () => {
           <p className="text-xs font-semibold uppercase tracking-wider text-blue-100">Tool 1</p>
           <h1 className="mt-2 text-3xl font-bold md:text-5xl">Complexity Analyzer</h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-cyan-50 md:text-base">
-            This tool estimates time complexity and space complexity directly from your code. It also
-            breaks down complexity by major steps and suggests optimization opportunities.
+            Result comes first: Time Complexity and Space Complexity. Then you get only short reasoning
+            and quick improvement hints.
           </p>
         </section>
 
         <CodeToolForm
           title="Analyze Complexity"
-          description="Paste code and get clear Big-O estimates for time and space with practical explanation."
+          description="First see Time/Space complexity. Then read a compact explanation."
           language={language}
           code={code}
           loading={loading}
           onLanguageChange={setLanguage}
           onCodeChange={setCode}
           onSubmit={handleSubmit}
-          submitLabel="Analyze Complexity"
+          submitLabel="Get Complexity Result"
         />
 
         <ToolResultCard

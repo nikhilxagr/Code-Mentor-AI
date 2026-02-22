@@ -36,6 +36,13 @@ const Navbar = () => {
         </button>
 
         <nav className="hidden items-center gap-2 md:flex">
+          <NavLink to="/about" className={linkClass}>
+            About
+          </NavLink>
+          <NavLink to="/contact" className={linkClass}>
+            Contact
+          </NavLink>
+
           {!isAuthenticated && (
             <>
               <NavLink to="/login" className={linkClass}>
@@ -81,6 +88,12 @@ const Navbar = () => {
           <div className="flex flex-col gap-2">
             {!isAuthenticated && (
               <>
+                <NavLink to="/about" className={linkClass} onClick={() => setOpen(false)}>
+                  About
+                </NavLink>
+                <NavLink to="/contact" className={linkClass} onClick={() => setOpen(false)}>
+                  Contact
+                </NavLink>
                 <NavLink to="/login" className={linkClass} onClick={() => setOpen(false)}>
                   Login
                 </NavLink>
@@ -96,6 +109,12 @@ const Navbar = () => {
 
             {isAuthenticated && (
               <>
+                <NavLink to="/about" className={linkClass} onClick={() => setOpen(false)}>
+                  About
+                </NavLink>
+                <NavLink to="/contact" className={linkClass} onClick={() => setOpen(false)}>
+                  Contact
+                </NavLink>
                 <NavLink to="/dashboard" className={linkClass} onClick={() => setOpen(false)}>
                   Dashboard
                 </NavLink>

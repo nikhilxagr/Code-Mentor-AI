@@ -49,21 +49,21 @@ const DebugTool = () => {
           <p className="text-xs font-semibold uppercase tracking-wider text-violet-100">Tool 2</p>
           <h1 className="mt-2 text-3xl font-bold md:text-5xl">Code Error Reviewer</h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-indigo-50 md:text-base">
-            This tool scans your code for syntax problems, logical bugs, runtime risks, and weak edge-case
-            handling. It returns a structured report with a corrected version and test cases.
+            Verdict appears first. If error exists, it says so immediately. Then you get corrected
+            copy-paste code and a compact issue list.
           </p>
         </section>
 
         <CodeToolForm
           title="Review Code For Errors"
-          description="Paste code to receive practical debugging feedback with better formatting and fixed code."
+          description="Works for LeetCode-style submissions too. Gives corrected code first, then brief issue details."
           language={language}
           code={code}
           loading={loading}
           onLanguageChange={setLanguage}
           onCodeChange={setCode}
           onSubmit={handleSubmit}
-          submitLabel="Find Errors"
+          submitLabel="Get Debug Result"
         />
 
         <ToolResultCard

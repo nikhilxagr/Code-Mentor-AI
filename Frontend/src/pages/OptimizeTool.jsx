@@ -49,21 +49,21 @@ const OptimizeTool = () => {
           <p className="text-xs font-semibold uppercase tracking-wider text-amber-100">Tool 3</p>
           <h1 className="mt-2 text-3xl font-bold md:text-5xl">Brute Force Optimizer</h1>
           <p className="mt-3 max-w-3xl text-sm leading-relaxed text-orange-50 md:text-base">
-            This tool upgrades brute-force code to a more optimal approach. It explains bottlenecks, gives
-            optimized code, and compares old vs new complexity.
+            First checks if your code is already optimal. If not, it returns optimized copy-paste code
+            first, then short notes and complexity comparison.
           </p>
         </section>
 
         <CodeToolForm
           title="Optimize Brute Force Code"
-          description="Paste your current solution and receive a faster, cleaner version with comparison."
+          description="Directly returns final best code first. Then brief comparison and notes."
           language={language}
           code={code}
           loading={loading}
           onLanguageChange={setLanguage}
           onCodeChange={setCode}
           onSubmit={handleSubmit}
-          submitLabel="Optimize Code"
+          submitLabel="Get Best Code"
         />
 
         <ToolResultCard
