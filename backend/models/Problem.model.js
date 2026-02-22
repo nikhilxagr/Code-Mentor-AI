@@ -9,12 +9,14 @@ const problemSchema = new mongoose.Schema({
 
   problemNumber: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
 
   problemTitle: {
     type: String,
-    required: true
+    required: true,
+    trim: true
   },
 
   solution: {
@@ -39,6 +41,8 @@ const problemSchema = new mongoose.Schema({
     default: Date.now
   }
 });
+
+problemSchema.index({ userId: 1, createdAt: -1 });
 
 const Problem = mongoose.model("Problem", problemSchema);
 export default Problem;

@@ -15,15 +15,20 @@ export const protect = async (req, res, next) => {
     if (!token) {
       return res.status(401).json({
         success: false,
-        message: "Not authorized, no token"
+        message: "Not authorized, token missing"
       });
     }
 
     try {
-      // Verify token
+      if (!process.env.JWT_SECRET) {
+        return res.status(500).json({
+          success: false,
+          message: "JWT secret is not configured"
+        });
+      }
+
       const decoded = jwt.verify(token, process.env.JWT_SECRET);
       
-      // Add user info to request
       req.user = decoded;
       
       next();

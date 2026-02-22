@@ -1,27 +1,33 @@
 import { Link } from "react-router-dom";
+import Navbar from "../components/common/Navbar";
 
 const NotFound = () => {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50 px-4 text-center">
-      {/* 404 Heading */}
-      <h1 className="text-7xl font-extrabold text-blue-600 mb-4">404</h1>
-
-      {/* Message */}
-      <h2 className="text-2xl font-semibold text-gray-800 mb-2">
-        Page Not Found
-      </h2>
-
-      <p className="text-gray-600 max-w-md mb-6">
-        The page you’re looking for doesn’t exist or may have been moved.
-      </p>
-
-      {/* Back to Home Button */}
-      <Link
-        to="/"
-        className="bg-blue-600 text-white px-6 py-3 rounded-md hover:bg-blue-700 transition"
-      >
-        Go Back Home
-      </Link>
+    <div className="min-h-screen">
+      <Navbar />
+      <main className="mx-auto flex max-w-4xl items-center px-4 py-14 md:px-6">
+        <section className="glass-panel w-full rounded-3xl p-10 text-center">
+          <p className="text-sm font-semibold uppercase tracking-wide text-teal-700">404</p>
+          <h1 className="mt-2 text-4xl font-bold text-slate-900 md:text-6xl">Page not found</h1>
+          <p className="mx-auto mt-4 max-w-lg text-sm text-slate-600 md:text-base">
+            The page you requested does not exist. Use the dashboard or solver links below to continue.
+          </p>
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <Link
+              to="/"
+              className="rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-teal-400 hover:text-teal-700"
+            >
+              Go home
+            </Link>
+            <Link
+              to="/dashboard"
+              className="rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-600"
+            >
+              Open dashboard
+            </Link>
+          </div>
+        </section>
+      </main>
     </div>
   );
 };

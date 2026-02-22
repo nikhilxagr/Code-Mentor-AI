@@ -1,30 +1,24 @@
 import { Navigate } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import useAuth from "../hooks/useAuth";
 
-/*
-  ProtectedRoute wraps pages that require login
-*/
 const ProtectedRoute = ({ children }) => {
   const { isAuthenticated, loading } = useAuth();
 
-  // Show loading state while checking authentication
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto"></div>
-          <p className="mt-4 text-gray-600">Loading...</p>
+      <div className="flex min-h-screen items-center justify-center px-4">
+        <div className="glass-panel rounded-2xl px-8 py-6 text-center">
+          <div className="mx-auto h-10 w-10 animate-spin rounded-full border-2 border-slate-300 border-t-teal-600" />
+          <p className="mt-3 text-sm font-semibold text-slate-700">Checking your session...</p>
         </div>
       </div>
     );
   }
 
-  // If user is NOT logged in → redirect to login
   if (!isAuthenticated) {
     return <Navigate to="/login" replace />;
   }
 
-  // If user IS logged in → show the page
   return children;
 };
 

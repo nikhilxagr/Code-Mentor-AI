@@ -1,18 +1,17 @@
 import axios from "axios";
 
-// Base API URL - will use environment variable for production
-const API_BASE_URL =
-  import.meta.env.VITE_API_URL || "http://localhost:5000/api";
+export const AUTH_EXPIRED_EVENT = "auth:expired";
 
-// Create axios instance with default config
+const API_BASE_URL =
+  (import.meta.env.VITE_API_URL || "http://localhost:5000/api").replace(/\/$/, "");
+
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
-    "Content-Type": "application/json",
-  },
+    "Content-Type": "application/json"
+  }
 });
 
-// Add a request interceptor to include auth token
 api.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem("token");
@@ -21,23 +20,25 @@ api.interceptors.request.use(
     }
     return config;
   },
-  (error) => {
-    return Promise.reject(error);
-  },
+  (error) => Promise.reject(error)
 );
 
-// Add a response interceptor to handle errors globally
 api.interceptors.response.use(
   (response) => response,
   (error) => {
-    if (error.response?.status === 401) {
-      // Token expired or invalid - clear auth and redirect to login
+    const isUnauthorized = error.response?.status === 401;
+    const requestUrl = String(error.config?.url || "");
+    const isAuthRequest =
+      requestUrl.includes("/auth/login") || requestUrl.includes("/auth/signup");
+
+    if (isUnauthorized && !isAuthRequest) {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
-      window.location.href = "/login";
+      window.dispatchEvent(new CustomEvent(AUTH_EXPIRED_EVENT));
     }
+
     return Promise.reject(error);
-  },
+  }
 );
 
 export default api;

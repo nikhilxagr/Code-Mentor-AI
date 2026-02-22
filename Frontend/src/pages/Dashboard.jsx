@@ -1,130 +1,168 @@
-import Navbar from "../components/common/Navbar";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import Navbar from "../components/common/Navbar";
+import useAuth from "../hooks/useAuth";
+import problemService from "../services/problemService";
+
+const formatDate = (value) => {
+  if (!value) return "N/A";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return "N/A";
+  return date.toLocaleDateString(undefined, {
+    year: "numeric",
+    month: "short",
+    day: "numeric"
+  });
+};
 
 const Dashboard = () => {
   const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+  const [stats, setStats] = useState({
+    solvedCount: 0,
+    latestProblem: null
+  });
+  const [history, setHistory] = useState([]);
+
+  useEffect(() => {
+    let active = true;
+
+    const loadDashboard = async () => {
+      setLoading(true);
+      setError("");
+
+      try {
+        const [statsData, historyData] = await Promise.all([
+          problemService.getStats(),
+          problemService.getHistory()
+        ]);
+
+        if (!active) return;
+
+        setStats(
+          statsData?.stats || {
+            solvedCount: 0,
+            latestProblem: null
+          }
+        );
+        setHistory(historyData?.history || []);
+      } catch (apiError) {
+        if (!active) return;
+        setError(apiError.response?.data?.message || "Failed to load dashboard data.");
+      } finally {
+        if (active) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadDashboard();
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const latestSolvedText = useMemo(() => {
+    if (!stats.latestProblem) {
+      return "No solved problems yet";
+    }
+    return `#${stats.latestProblem.problemNumber} on ${formatDate(stats.latestProblem.createdAt)}`;
+  }, [stats.latestProblem]);
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="min-h-screen">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-6 py-10">
-        {/* Welcome Section */}
-        <section className="mb-10 bg-white rounded-2xl p-8 shadow-lg border border-gray-100">
-          <div className="flex items-center justify-between flex-wrap gap-4">
-            <div>
-              <h2 className="text-4xl font-bold text-gray-800 mb-2">
-                Welcome back, {user?.name || "Developer"}! 👋
-              </h2>
-              <p className="text-gray-600 text-lg">
-                Ready to level up your DSA skills today?
-              </p>
-            </div>
-            <div className="bg-gradient-to-r from-blue-500 to-indigo-500 text-white px-6 py-3 rounded-lg shadow-md">
-              <p className="text-sm font-semibold">Your Progress</p>
-              <p className="text-2xl font-bold">Coming Soon</p>
-            </div>
-          </div>
-        </section>
-
-        {/* Quick Stats */}
-        <section className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-10">
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
-            <div className="flex items-center gap-4">
-              <div className="bg-green-100 p-4 rounded-full">
-                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-gray-500 text-sm">Problems Solved</p>
-                <p className="text-3xl font-bold text-gray-800">0</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
-            <div className="flex items-center gap-4">
-              <div className="bg-blue-100 p-4 rounded-full">
-                <svg className="w-8 h-8 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-gray-500 text-sm">Current Streak</p>
-                <p className="text-3xl font-bold text-gray-800">0 days</p>
-              </div>
-            </div>
-          </div>
-
-          <div className="bg-white p-6 rounded-xl shadow-md border border-gray-100 hover:shadow-lg transition">
-            <div className="flex items-center gap-4">
-              <div className="bg-purple-100 p-4 rounded-full">
-                <svg className="w-8 h-8 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-              <div>
-                <p className="text-gray-500 text-sm">Time Spent</p>
-                <p className="text-3xl font-bold text-gray-800">0h</p>
-              </div>
+      <main className="mx-auto max-w-7xl px-4 pb-16 pt-10 md:px-6">
+        <section className="glass-panel rounded-3xl p-6 md:p-10">
+          <p className="text-xs font-semibold uppercase tracking-wide text-teal-700">Dashboard</p>
+          <h1 className="mt-2 text-3xl font-bold text-slate-900 md:text-5xl">
+            Welcome, {user?.name || "Learner"}
+          </h1>
+          <p className="mt-3 max-w-2xl text-sm leading-relaxed text-slate-600 md:text-base">
+            Your stats come directly from backend protected endpoints so you can track real usage and
+            revisit generated solutions quickly.
+          </p>
+          <div className="mt-6">
+            <div className="flex flex-wrap gap-3">
+              <Link
+                to="/solve"
+                className="inline-flex rounded-xl bg-teal-700 px-5 py-3 text-sm font-semibold text-white transition hover:bg-teal-600"
+              >
+                Solve another problem
+              </Link>
+              <Link
+                to="/tools"
+                className="inline-flex rounded-xl border border-slate-300 bg-white px-5 py-3 text-sm font-semibold text-slate-700 transition hover:border-teal-300 hover:text-teal-700"
+              >
+                Open AI Tools
+              </Link>
             </div>
           </div>
         </section>
 
-        {/* Action Cards */}
-        <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {/* Solve Problem Card */}
-          <div className="bg-gradient-to-br from-blue-500 to-indigo-600 p-8 rounded-2xl shadow-xl text-white hover:scale-105 transition transform">
-            <div className="mb-4">
-              <svg className="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-              </svg>
-            </div>
-            <h3 className="text-2xl font-bold mb-3">Solve DSA Problem</h3>
-            <p className="text-blue-100 mb-6">
-              Get AI-powered explanations for any LeetCode problem
-            </p>
-            <Link
-              to="/solve"
-              className="inline-block bg-white text-blue-600 px-6 py-3 rounded-lg font-semibold hover:bg-blue-50 transition shadow-lg"
-            >
-              Start Solving →
-            </Link>
-          </div>
+        {error && (
+          <section className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-4 text-sm text-rose-700">
+            {error}
+          </section>
+        )}
 
-          {/* Learn Concepts Card */}
-          <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-            <div className="mb-4">
-              <svg className="w-12 h-12 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Learn DSA Concepts</h3>
-            <p className="text-gray-600 mb-6">
-              Master data structures and algorithms step by step
-            </p>
-            <button className="text-gray-400 text-sm font-medium">
-              Coming Soon...
-            </button>
-          </div>
+        <section className="mt-6 grid gap-4 md:grid-cols-3">
+          <article className="glass-panel rounded-2xl p-5">
+            <p className="text-sm font-semibold text-slate-600">Problems solved</p>
+            <p className="mt-2 text-4xl font-bold text-slate-900">{loading ? "..." : stats.solvedCount}</p>
+          </article>
+          <article className="glass-panel rounded-2xl p-5">
+            <p className="text-sm font-semibold text-slate-600">Latest solved</p>
+            <p className="mt-2 text-sm font-semibold text-slate-900">{loading ? "Loading..." : latestSolvedText}</p>
+          </article>
+          <article className="glass-panel rounded-2xl p-5">
+            <p className="text-sm font-semibold text-slate-600">Account email</p>
+            <p className="mt-2 text-sm font-semibold text-slate-900">{user?.email || "N/A"}</p>
+          </article>
+        </section>
 
-          {/* Track Progress Card */}
-          <div className="bg-white p-8 rounded-2xl shadow-lg border border-gray-100 hover:shadow-xl transition">
-            <div className="mb-4">
-              <svg className="w-12 h-12 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-              </svg>
-            </div>
-            <h3 className="text-xl font-bold text-gray-800 mb-3">Track Your Progress</h3>
-            <p className="text-gray-600 mb-6">
-              Monitor your learning journey with detailed analytics
+        <section className="mt-6 glass-panel rounded-3xl p-6">
+          <h2 className="text-2xl font-semibold text-slate-900">Recent AI solutions</h2>
+          <p className="mt-1 text-sm text-slate-600">Last 20 saved responses from your account.</p>
+
+          {loading && <p className="mt-4 text-sm text-slate-600">Loading history...</p>}
+
+          {!loading && history.length === 0 && (
+            <p className="mt-4 text-sm text-slate-600">
+              No history yet. Start with one problem in the solver page.
             </p>
-            <button className="text-gray-400 text-sm font-medium">
-              Coming Soon...
-            </button>
-          </div>
+          )}
+
+          {!loading && history.length > 0 && (
+            <div className="mt-4 overflow-hidden rounded-xl border border-slate-200">
+              <table className="min-w-full divide-y divide-slate-200 bg-white">
+                <thead className="bg-slate-50">
+                  <tr>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                      Problem
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                      Title
+                    </th>
+                    <th className="px-4 py-3 text-left text-xs font-semibold uppercase tracking-wide text-slate-600">
+                      Date
+                    </th>
+                  </tr>
+                </thead>
+                <tbody className="divide-y divide-slate-100">
+                  {history.map((item) => (
+                    <tr key={item._id}>
+                      <td className="px-4 py-3 text-sm font-semibold text-teal-700">#{item.problemNumber}</td>
+                      <td className="px-4 py-3 text-sm text-slate-700">{item.problemTitle}</td>
+                      <td className="px-4 py-3 text-sm text-slate-600">{formatDate(item.createdAt)}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </section>
       </main>
     </div>

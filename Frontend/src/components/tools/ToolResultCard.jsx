@@ -8,12 +8,7 @@ const normalizeMarkdown = (input) => {
     return "";
   }
 
-  // Fix malformed list items where model outputs:
-  // *
-  // `item`
   text = text.replace(/(^|\n)([*-])\s*\n(?=`)/g, "$1$2 ");
-
-  // Convert bare language lines into fenced blocks when model omits backticks.
   text = text.replace(/(^|\n)python\s*\n(?=class|def|from|import)/gi, "$1```python\n");
   text = text.replace(
     /(^|\n)javascript\s*\n(?=\/\*\*|var |const |let |function)/gi,
@@ -84,7 +79,7 @@ const markdownComponents = {
   }
 };
 
-const OutputSection = ({ result }) => {
+const ToolResultCard = ({ title, subtitle, result }) => {
   if (!result) {
     return null;
   }
@@ -94,7 +89,7 @@ const OutputSection = ({ result }) => {
       <section className="mt-6 rounded-2xl border border-rose-200 bg-rose-50 p-5">
         <h2 className="text-lg font-semibold text-rose-700">Request failed</h2>
         <p className="mt-2 text-sm text-rose-700">
-          {result.message || result.answer || "Unable to fetch solution."}
+          {result.message || result.answer || "Unable to process code."}
         </p>
       </section>
     );
@@ -107,7 +102,6 @@ const OutputSection = ({ result }) => {
     <section className="mt-8 space-y-4">
       <div className="flex flex-wrap items-center gap-2 text-xs font-semibold">
         <span className="rounded-full bg-emerald-100 px-3 py-1 text-emerald-700">Response generated</span>
-        {result.saved && <span className="rounded-full bg-teal-100 px-3 py-1 text-teal-700">Saved to account</span>}
         {result.modelUsed && (
           <span className="rounded-full bg-slate-200 px-3 py-1 text-slate-700">Model: {result.modelUsed}</span>
         )}
@@ -118,17 +112,14 @@ const OutputSection = ({ result }) => {
 
       {result.wasTruncated && (
         <div className="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-800">
-          Response hit model length limits. The backend continued automatically, but a small tail may still be
-          missing.
+          Response hit model length limits. A continuation was requested automatically.
         </div>
       )}
 
       <article className="glass-panel rounded-3xl p-5 md:p-8">
         <header className="border-b border-slate-200 pb-4">
-          <h2 className="text-2xl font-semibold text-slate-900">AI Solution</h2>
-          <p className="mt-1 text-sm text-slate-600">
-            Review the explanation, then code it yourself before copying final implementation.
-          </p>
+          <h2 className="text-2xl font-semibold text-slate-900">{title}</h2>
+          <p className="mt-1 text-sm text-slate-600">{subtitle}</p>
         </header>
 
         <div className="mt-5 rounded-2xl border border-slate-200 bg-white px-4 py-2 md:px-6 md:py-4">
@@ -158,4 +149,4 @@ const OutputSection = ({ result }) => {
   );
 };
 
-export default OutputSection;
+export default ToolResultCard;

@@ -1,7 +1,7 @@
-import { createContext, useContext, useState, useEffect } from "react";
+import { useEffect, useState } from "react";
+import { AUTH_EXPIRED_EVENT } from "../services/api";
 import authService from "../services/authService";
-
-const AuthContext = createContext(null);
+import AuthContext from "./auth-context";
 
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -9,14 +9,47 @@ export const AuthProvider = ({ children }) => {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
-    const storedUser = authService.getCurrentUser();
+    const bootstrapAuth = async () => {
+      const hasToken = authService.isAuthenticated();
+      if (!hasToken) {
+        setLoading(false);
+        return;
+      }
 
-    if (token && storedUser) {
-      setIsAuthenticated(true);
-      setUser(storedUser);
-    }
-    setLoading(false);
+      try {
+        const profile = await authService.getProfile();
+        const nextUser = profile?.user || authService.getCurrentUser();
+
+        if (!nextUser) {
+          throw new Error("No user profile available");
+        }
+
+        localStorage.setItem("user", JSON.stringify(nextUser));
+        setUser(nextUser);
+        setIsAuthenticated(true);
+      } catch {
+        authService.logout();
+        setUser(null);
+        setIsAuthenticated(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    bootstrapAuth();
+  }, []);
+
+  useEffect(() => {
+    const handleAuthExpired = () => {
+      authService.logout();
+      setIsAuthenticated(false);
+      setUser(null);
+    };
+
+    window.addEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+    return () => {
+      window.removeEventListener(AUTH_EXPIRED_EVENT, handleAuthExpired);
+    };
   }, []);
 
   const login = async (credentials) => {
@@ -28,7 +61,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        error: error.response?.data?.message || "Login failed. Please try again.",
+        error: error.response?.data?.message || "Login failed. Please try again."
       };
     }
   };
@@ -42,7 +75,7 @@ export const AuthProvider = ({ children }) => {
     } catch (error) {
       return {
         success: false,
-        error: error.response?.data?.message || "Registration failed. Please try again.",
+        error: error.response?.data?.message || "Registration failed. Please try again."
       };
     }
   };
@@ -61,15 +94,10 @@ export const AuthProvider = ({ children }) => {
         loading,
         login,
         register,
-        logout,
+        logout
       }}
     >
       {children}
     </AuthContext.Provider>
   );
-};
-
-// ✅ THIS EXPORT FIXES YOUR ERROR
-export const useAuth = () => {
-  return useContext(AuthContext);
 };

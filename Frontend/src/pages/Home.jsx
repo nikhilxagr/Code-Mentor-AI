@@ -1,109 +1,72 @@
 import { Link } from "react-router-dom";
 import Navbar from "../components/common/Navbar";
+import useAuth from "../hooks/useAuth";
 
+const features = [
+  {
+    title: "Concept-first explanations",
+    description:
+      "Each response teaches intuition first, then implementation, so you can solve similar problems on your own."
+  },
+  {
+    title: "Fast interview prep loop",
+    description:
+      "Pick a LeetCode number, get a structured breakdown, and practice follow-ups in one focused flow."
+  },
+  {
+    title: "Your personal history",
+    description:
+      "Saved responses and dashboard stats help you track volume and revisit what you solved recently."
+  }
+];
 
 const Home = () => {
+  const { isAuthenticated } = useAuth();
+
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
-      {/*  NAVBAR  */}
-      <header className="bg-white border-b">
-        <Navbar />
-      </header>
+    <div className="min-h-screen">
+      <Navbar />
 
-      {/*  HERO SECTION  */}
-      <main>
-        <section className="max-w-7xl mx-auto px-6 py-16 text-center">
-          <h2 className="text-5xl font-extrabold text-gray-900 leading-tight mb-6">
-            Learn DSA the <span className="text-blue-600">Right Way</span>
-          </h2>
-
-          <p className="max-w-2xl mx-auto text-lg text-gray-600 mb-10">
-            CodeMentor AI helps beginners understand how to{" "}
-            <span className="font-semibold text-gray-800">think logically</span>{" "}
-            while solving DSA problems — not just copy solutions.
+      <main className="mx-auto max-w-7xl px-4 pb-16 pt-10 md:px-6">
+        <section className="glass-panel fade-slide rounded-3xl px-6 py-10 md:px-12 md:py-14">
+          <p className="mb-4 inline-flex rounded-full bg-teal-100 px-3 py-1 text-xs font-semibold uppercase tracking-wide text-teal-700">
+            AI DSA mentor for daily practice
           </p>
 
-          <div className="flex justify-center gap-5">
+          <h1 className="text-4xl font-bold leading-tight md:text-6xl">
+            Learn problem solving with <span className="headline-gradient">clear AI guidance</span>
+          </h1>
+
+          <p className="mt-5 max-w-3xl text-base leading-relaxed text-slate-600 md:text-lg">
+            CodeMentor AI connects your login, solver, and progress in one place. Ask for any LeetCode
+            problem by number and get an explanation you can study, run, and revisit.
+          </p>
+
+          <div className="mt-8 flex flex-wrap gap-3">
             <Link
-              to="/signup"
-              className="bg-blue-600 text-white px-8 py-3 rounded-lg text-lg hover:bg-blue-700 transition"
+              to={isAuthenticated ? "/solve" : "/signup"}
+              className="rounded-xl bg-teal-700 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-teal-900/20 transition hover:-translate-y-0.5 hover:bg-teal-600"
             >
-              Get Started 🚀
+              {isAuthenticated ? "Go to Solver" : "Create Free Account"}
             </Link>
             <Link
-              to="/login"
-              className="border border-blue-600 text-blue-600 px-8 py-3 rounded-lg text-lg hover:bg-blue-50 transition"
+              to={isAuthenticated ? "/dashboard" : "/login"}
+              className="rounded-xl border border-slate-300 bg-white px-6 py-3 text-sm font-semibold text-slate-700 transition hover:border-teal-300 hover:text-teal-700"
             >
-              Learn More
+              {isAuthenticated ? "Open Dashboard" : "Login"}
             </Link>
           </div>
         </section>
 
-        {/*  FEATURES SECTION  */}
-        <section className="bg-white py-20">
-          <div className="max-w-7xl mx-auto px-6">
-            <h3 className="text-3xl font-bold text-center text-gray-900 mb-12">
-              Why CodeMentor AI?
-            </h3>
-
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {/* Feature 1 */}
-              <div className="bg-gray-50 p-8 rounded-xl border hover:shadow-md transition">
-                <h4 className="text-xl font-semibold mb-3">
-                  🧠 Clear Problem Approach
-                </h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Understand the exact mindset required to solve DSA problems
-                  step by step, just like an experienced mentor.
-                </p>
-              </div>
-
-              {/* Feature 2 */}
-              <div className="bg-gray-50 p-8 rounded-xl border hover:shadow-md transition">
-                <h4 className="text-xl font-semibold mb-3">
-                  📘 Beginner-Friendly Explanations
-                </h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Explanations designed specifically for freshers and
-                  early-stage developers, with no unnecessary jargon.
-                </p>
-              </div>
-
-              {/* Feature 3 */}
-              <div className="bg-gray-50 p-8 rounded-xl border hover:shadow-md transition">
-                <h4 className="text-xl font-semibold mb-3">
-                  ⚡ Faster Interview Prep
-                </h4>
-                <p className="text-gray-600 text-sm leading-relaxed">
-                  Focus on logic and patterns so you can prepare smarter and
-                  faster for coding interviews.
-                </p>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/*  CALL TO ACTION  */}
-        <section className="bg-blue-600 py-20 text-center">
-          <h3 className="text-3xl font-bold text-white mb-4">
-            Ready to start your DSA journey?
-          </h3>
-          <p className="text-blue-100 mb-8">
-            Join CodeMentor AI and learn problem-solving the right way.
-          </p>
-          <Link
-            to="/signup"
-            className="bg-white text-blue-600 px-8 py-3 rounded-lg font-semibold hover:bg-blue-50 transition"
-          >
-            Create Free Account
-          </Link>
+        <section className="mt-10 grid gap-4 md:grid-cols-3">
+          {features.map((feature) => (
+            <article key={feature.title} className="glass-panel rounded-2xl p-6">
+              <h2 className="text-xl font-semibold text-slate-800">{feature.title}</h2>
+              <p className="mt-3 text-sm leading-relaxed text-slate-600">{feature.description}</p>
+            </article>
+          ))}
         </section>
       </main>
-
-      {/*  FOOTER  */}
-      <footer className="bg-white border-t py-4 text-center text-sm text-gray-500">
-        © 2026 CodeMentor AI · Built for beginners
-      </footer>
     </div>
   );
 };

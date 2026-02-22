@@ -1,12 +1,41 @@
-import User from "../models/User.model.js";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import User from "../models/User.model.js";
+
+const ensureDatabaseReady = (res) => {
+  if (global.isMongoConnected) {
+    return true;
+  }
+
+  res.status(503).json({
+    success: false,
+    message: "Database unavailable. Please check MongoDB connection and retry."
+  });
+  return false;
+};
+
+const signToken = (userId) => {
+  if (!process.env.JWT_SECRET) {
+    throw new Error("JWT secret is missing");
+  }
+
+  return jwt.sign({ userId }, process.env.JWT_SECRET, {
+    expiresIn: process.env.JWT_EXPIRE || "7d"
+  });
+};
 
 export const signup = async (req, res) => {
   try {
-    const { name, email, password } = req.body;
+    if (!ensureDatabaseReady(res)) {
+      return;
+    }
 
-    // Validation
+    const name = String(req.body?.name || "").trim();
+    const email = String(req.body?.email || "")
+      .trim()
+      .toLowerCase();
+    const password = String(req.body?.password || "");
+
     if (!name || !email || !password) {
       return res.status(400).json({
         success: false,
@@ -14,7 +43,13 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Email validation
+    if (password.length < 6) {
+      return res.status(400).json({
+        success: false,
+        message: "Password must be at least 6 characters long"
+      });
+    }
+
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(email)) {
       return res.status(400).json({
@@ -23,9 +58,7 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Check if user exists
     const existingUser = await User.findOne({ email });
-
     if (existingUser) {
       return res.status(409).json({
         success: false,
@@ -33,24 +66,16 @@ export const signup = async (req, res) => {
       });
     }
 
-    // Hash password
     const hashedPassword = await bcrypt.hash(password, 10);
-
-    // Create user
     const newUser = await User.create({
       name,
       email,
       password: hashedPassword
     });
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: newUser._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = signToken(newUser._id);
 
-    res.status(201).json({
+    return res.status(201).json({
       success: true,
       message: "Signup successful",
       token,
@@ -60,10 +85,9 @@ export const signup = async (req, res) => {
         email: newUser.email
       }
     });
-
   } catch (error) {
-    console.error('Signup error:', error);
-    res.status(500).json({
+    console.error("Signup error:", error);
+    return res.status(500).json({
       success: false,
       message: "Signup failed",
       error: error.message
@@ -73,9 +97,15 @@ export const signup = async (req, res) => {
 
 export const login = async (req, res) => {
   try {
-    const { email, password } = req.body;
+    if (!ensureDatabaseReady(res)) {
+      return;
+    }
 
-    // Validation
+    const email = String(req.body?.email || "")
+      .trim()
+      .toLowerCase();
+    const password = String(req.body?.password || "");
+
     if (!email || !password) {
       return res.status(400).json({
         success: false,
@@ -83,9 +113,7 @@ export const login = async (req, res) => {
       });
     }
 
-    // Find user by email
     const user = await User.findOne({ email });
-
     if (!user) {
       return res.status(401).json({
         success: false,
@@ -93,7 +121,6 @@ export const login = async (req, res) => {
       });
     }
 
-    // Verify password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       return res.status(401).json({
@@ -102,14 +129,9 @@ export const login = async (req, res) => {
       });
     }
 
-    // Generate JWT token
-    const token = jwt.sign(
-      { userId: user._id },
-      process.env.JWT_SECRET,
-      { expiresIn: "7d" }
-    );
+    const token = signToken(user._id);
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       message: "Login successful",
       token,
@@ -119,10 +141,9 @@ export const login = async (req, res) => {
         email: user.email
       }
     });
-
   } catch (error) {
-    console.error('Login error:', error);
-    res.status(500).json({
+    console.error("Login error:", error);
+    return res.status(500).json({
       success: false,
       message: "Login failed",
       error: error.message
@@ -132,11 +153,12 @@ export const login = async (req, res) => {
 
 export const getProfile = async (req, res) => {
   try {
-    // req.user is set by auth middleware
-    const userId = req.user.userId;
+    if (!ensureDatabaseReady(res)) {
+      return;
+    }
 
-    // Fetch user from DB
-    const user = await User.findById(userId).select('-password');
+    const userId = req.user.userId;
+    const user = await User.findById(userId).select("-password");
 
     if (!user) {
       return res.status(404).json({
@@ -145,7 +167,7 @@ export const getProfile = async (req, res) => {
       });
     }
 
-    res.status(200).json({
+    return res.status(200).json({
       success: true,
       user: {
         id: user._id,
@@ -154,10 +176,9 @@ export const getProfile = async (req, res) => {
         createdAt: user.createdAt
       }
     });
-
   } catch (error) {
-    console.error('Get profile error:', error);
-    res.status(500).json({
+    console.error("Get profile error:", error);
+    return res.status(500).json({
       success: false,
       message: "Failed to fetch profile",
       error: error.message

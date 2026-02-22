@@ -1,61 +1,73 @@
-import { Link } from "react-router-dom";
-import { useAuth } from "../../context/AuthContext";
+import { useState } from "react";
+import { Link, NavLink } from "react-router-dom";
+import useAuth from "../../hooks/useAuth";
+
+const linkClass = ({ isActive }) =>
+  `px-3 py-2 rounded-md text-sm font-semibold transition ${
+    isActive ? "bg-teal-100 text-teal-700" : "text-slate-700 hover:text-teal-700 hover:bg-white"
+  }`;
 
 const Navbar = () => {
+  const [open, setOpen] = useState(false);
   const { isAuthenticated, logout, user } = useAuth();
 
   return (
-    <header className="bg-white border-b border-gray-200 shadow-sm sticky top-0 z-50">
-      <div className="max-w-7xl mx-auto px-6 py-4 flex justify-between items-center">
-        <Link to="/" className="flex items-center gap-2">
-          <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-2 rounded-lg">
-            <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
-            </svg>
-          </div>
-          <span className="text-2xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600">
-            CodeMentor AI
+    <header className="sticky top-0 z-50 border-b border-white/70 bg-white/75 backdrop-blur">
+      <div className="mx-auto flex max-w-7xl items-center justify-between px-4 py-3 md:px-6">
+        <Link to="/" className="flex items-center gap-3" onClick={() => setOpen(false)}>
+          <span className="flex h-9 w-9 items-center justify-center rounded-lg bg-teal-700 text-sm font-bold text-white">
+            CM
           </span>
+          <div>
+            <p className="text-sm font-semibold leading-none text-slate-800">CodeMentor AI</p>
+            <p className="text-xs text-slate-500">DSA with guided AI feedback</p>
+          </div>
         </Link>
 
-        <nav className="flex gap-4 items-center">
-          {!isAuthenticated ? (
+        <button
+          type="button"
+          className="rounded-md border border-slate-200 p-2 md:hidden"
+          onClick={() => setOpen((value) => !value)}
+          aria-label="Toggle menu"
+        >
+          <svg className="h-5 w-5 text-slate-700" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 7h16M4 12h16M4 17h16" />
+          </svg>
+        </button>
+
+        <nav className="hidden items-center gap-2 md:flex">
+          {!isAuthenticated && (
             <>
-              <Link
-                to="/login"
-                className="text-gray-700 hover:text-blue-600 font-medium transition"
-              >
+              <NavLink to="/login" className={linkClass}>
                 Login
-              </Link>
+              </NavLink>
               <Link
                 to="/signup"
-                className="bg-gradient-to-r from-blue-600 to-indigo-600 text-white px-6 py-2 rounded-lg hover:from-blue-700 hover:to-indigo-700 font-semibold transition shadow-md hover:shadow-lg"
+                className="rounded-md bg-teal-700 px-4 py-2 text-sm font-semibold text-white transition hover:bg-teal-600"
               >
-                Sign Up
+                Create Account
               </Link>
             </>
-          ) : (
+          )}
+
+          {isAuthenticated && (
             <>
-              {user && (
-                <span className="text-gray-600 text-sm hidden md:block">
-                  Hey, <span className="font-semibold text-gray-800">{user.name}</span>
-                </span>
-              )}
-              <Link
-                to="/dashboard"
-                className="text-gray-700 hover:text-blue-600 font-medium transition"
-              >
+              <span className="rounded-full bg-amber-100 px-3 py-1 text-xs font-semibold text-amber-700">
+                {user?.name || "Learner"}
+              </span>
+              <NavLink to="/dashboard" className={linkClass}>
                 Dashboard
-              </Link>
-              <Link
-                to="/solve"
-                className="text-gray-700 hover:text-blue-600 font-medium transition"
-              >
+              </NavLink>
+              <NavLink to="/solve" className={linkClass}>
                 Solve
-              </Link>
+              </NavLink>
+              <NavLink to="/tools" className={linkClass}>
+                Tools
+              </NavLink>
               <button
+                type="button"
                 onClick={logout}
-                className="bg-red-500 text-white px-5 py-2 rounded-lg hover:bg-red-600 font-medium transition shadow-md hover:shadow-lg"
+                className="rounded-md border border-slate-300 px-4 py-2 text-sm font-semibold text-slate-700 transition hover:border-rose-400 hover:text-rose-600"
               >
                 Logout
               </button>
@@ -63,6 +75,51 @@ const Navbar = () => {
           )}
         </nav>
       </div>
+
+      {open && (
+        <div className="border-t border-slate-200 bg-white px-4 py-3 md:hidden">
+          <div className="flex flex-col gap-2">
+            {!isAuthenticated && (
+              <>
+                <NavLink to="/login" className={linkClass} onClick={() => setOpen(false)}>
+                  Login
+                </NavLink>
+                <Link
+                  to="/signup"
+                  className="rounded-md bg-teal-700 px-4 py-2 text-center text-sm font-semibold text-white"
+                  onClick={() => setOpen(false)}
+                >
+                  Create Account
+                </Link>
+              </>
+            )}
+
+            {isAuthenticated && (
+              <>
+                <NavLink to="/dashboard" className={linkClass} onClick={() => setOpen(false)}>
+                  Dashboard
+                </NavLink>
+                <NavLink to="/solve" className={linkClass} onClick={() => setOpen(false)}>
+                  Solve
+                </NavLink>
+                <NavLink to="/tools" className={linkClass} onClick={() => setOpen(false)}>
+                  Tools
+                </NavLink>
+                <button
+                  type="button"
+                  className="rounded-md border border-slate-300 px-4 py-2 text-left text-sm font-semibold text-slate-700"
+                  onClick={() => {
+                    logout();
+                    setOpen(false);
+                  }}
+                >
+                  Logout
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      )}
     </header>
   );
 };

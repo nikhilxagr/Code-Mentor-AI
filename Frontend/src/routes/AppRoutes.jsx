@@ -5,6 +5,10 @@ import Login from "../pages/Login";
 import Signup from "../pages/Signup";
 import Dashboard from "../pages/Dashboard";
 import ProblemSolver from "../pages/ProblemSolver";
+import ToolsHub from "../pages/ToolsHub";
+import ComplexityTool from "../pages/ComplexityTool";
+import DebugTool from "../pages/DebugTool";
+import OptimizeTool from "../pages/OptimizeTool";
 import NotFound from "../pages/NotFound";
 
 import ProtectedRoute from "./ProtectedRoute";
@@ -32,6 +36,42 @@ const AppRoutes = () => {
         element={
           <ProtectedRoute>
             <ProblemSolver />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/tools"
+        element={
+          <ProtectedRoute>
+            <ToolsHub />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/tools/complexity"
+        element={
+          <ProtectedRoute>
+            <ComplexityTool />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/tools/debug"
+        element={
+          <ProtectedRoute>
+            <DebugTool />
+          </ProtectedRoute>
+        }
+      />
+
+      <Route
+        path="/tools/optimize"
+        element={
+          <ProtectedRoute>
+            <OptimizeTool />
           </ProtectedRoute>
         }
       />
